@@ -10,6 +10,22 @@ rail.addEventListener('pointermove', e => { if (!down) return; e.preventDefault(
 const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) entry.target.animate([{opacity:0,transform:'translateY(30px)'},{opacity:1,transform:'translateY(0)'}],{duration:700,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'}); }), { threshold: .12 });
 document.querySelectorAll('.statement h2,.statement-foot,.work-head,.project,.tool-cloud,.contact-title').forEach(el => { el.style.opacity = 0; observer.observe(el); });
 
+const revealOnce = (selector, className, opts) => {
+  const els = document.querySelectorAll(selector);
+  if (!els.length) return;
+  const io = new IntersectionObserver(entries => entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add(className);
+      io.unobserve(entry.target);
+    }
+  }), opts || { threshold: 0.25 });
+  els.forEach(el => io.observe(el));
+};
+
+revealOnce('.exp-node', 'in-view', { threshold: 0.35 });
+revealOnce('.skill-flow-wrap', 'in-view', { threshold: 0.08 });
+revealOnce('.cert-item', 'in-view', { threshold: 0.3 });
+
 const slides = [...document.querySelectorAll('main > section')];
 slides.forEach((slide, index) => {
   if (index === 0) return;

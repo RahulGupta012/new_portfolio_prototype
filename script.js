@@ -2,10 +2,12 @@ const glow = document.querySelector('.cursor-glow');
 window.addEventListener('pointermove', e => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
 
 const rail = document.querySelector('.project-rail');
-let down = false, startX = 0, startScroll = 0, moved = false;
+let down = false, startX = 0, startScroll = 0, moved = false, suppressClick = false;
 rail.addEventListener('pointerdown', e => {
+  if (e.target.closest('a, button')) return;
   down = true;
   moved = false;
+  suppressClick = false;
   startX = e.pageX;
   startScroll = rail.parentElement.scrollLeft;
   rail.classList.add('dragging');
@@ -14,21 +16,25 @@ rail.addEventListener('pointerdown', e => {
 rail.addEventListener('pointermove', e => {
   if (!down) return;
   const dx = e.pageX - startX;
-  if (Math.abs(dx) > 6) moved = true;
+  if (Math.abs(dx) > 6) {
+    moved = true;
+    suppressClick = true;
+  }
   if (moved) e.preventDefault();
   rail.parentElement.scrollLeft = startScroll - dx * 1.15;
 });
-['pointerup', 'pointercancel', 'pointerleave'].forEach(name => rail.addEventListener(name, () => {
+['pointerup', 'pointercancel'].forEach(name => rail.addEventListener(name, () => {
   down = false;
   rail.classList.remove('dragging');
 }));
 // Swallow the click that follows a drag so it doesn't accidentally
 // trigger a "View Project" button or a GitHub/Live link underneath the pointer.
 rail.addEventListener('click', e => {
-  if (moved) {
+  if (e.target.closest('a, button')) return;
+  if (suppressClick) {
     e.preventDefault();
     e.stopPropagation();
-    moved = false;
+    suppressClick = false;
   }
 }, true);
 

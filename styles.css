@@ -695,7 +695,6 @@ main > section {
 }
 
 .project-rail.dragging { cursor: grabbing; }
-.project-rail.dragging * { pointer-events: none; }
 
 .project {
   position: relative;
